@@ -1,9 +1,13 @@
 #import openpyxl
 import numpy as np
 
-deck = np.array(['alpha','alpha','alpha','zeta','zeta','zeta','gamma','gamma','gamma','delta','delta','delta','nova','nova','nova',
-        'fafnir','fafnir','fafnir','tera','emergency','emergency','emergency','foolish','called','prep','prep','prep','valk', 'jack', 'jack', 'jack', 'efb', 'efb', 'efb',
-        'met','ash','ash','ash','nibiru','nibiru','nibiru','diviner','benten','benten','benten','natasha','draconids','pain','shot','shot','shot','ariadne'])
+deck = np.array(['alpha','alpha','alpha','zeta','zeta','zeta','gamma','gamma','delta','nova','nova','nova',
+        'fafnir','fafnir','fafnir','emergency','emergency','emergency','foolish','called',
+        'prep','prep','jack','jack','jack','efb','efb',
+        'met','diviner','benten','benten','benten','natasha','draconids','pain','shot','shot','shot','ariadne',
+        'ne','ne','ne',
+        'ne','ne','ne',
+        'ne','ne','ne'])
 print("deck size: %d" % len(deck))
 hand = []
 playable = 0
@@ -18,6 +22,8 @@ nfaf = 0
 nfafper = 0
 nfafbric = 0
 nfafbricper = 0
+necom = 0
+necomper = 0
 
 for run in range(0,100000):
     hand = []
@@ -63,6 +69,8 @@ for run in range(0,100000):
     trap = 0
     
     combo = 0
+    
+    ne = 0
 
 
 
@@ -134,10 +142,14 @@ for run in range(0,100000):
             efb = 1
             if ben == 0:
                 ben += 1
-            elif ben == 0 and pain == 0:
+            elif ben > 0 and pain == 0:
                 pain == 1
-            elif pain == 1:
+            elif pain == 1 and drac == 0:
+                drac += 1
+            elif pain == 1 and drac == 1:
                 ben += 1
+        if hand[i] == 'ne':
+            ne += 1
         """
         if hand[i] == 'dragged':
             drag = 1
@@ -172,21 +184,21 @@ for run in range(0,100000):
         a = 1
     elif fool == 1 and a == 1 and (dupenames > 1 or freerit >= 1):
         search += 1
-    if a == 1 and (z == 1 or g == 1 or d == 1 or search >= 1 or ben >= 1):
+    if a == 1 and (z == 1 or g == 1 or d == 1 or em == 1 or no == 1 or ben >= 1):
         combo += 1
     elif (z == 1 or g == 1 or d == 1 or ben >= 1 or div == 1) and search >= 1:
         combo += 1
-    elif search >= 2:
+    elif em == 1 and no == 1:
         combo += 1
     elif z == 1 and (ben >= 1 or div == 1):
         combo += 1
     elif g == 1 and names >= 2 and ben > 0:
         combo += 1
-    elif d == 1 and ben >= 1 and (a == 1 or z == 1 or g == 1 or search >= 1):
+    elif d == 1 and ben >= 1 and (a == 1 or z == 1 or g == 1 or em == 1 or no == 1):
         combo += 1
-    elif d == 1 and ben >= 1 and (a == 1 or z == 1 or g == 1 or search >= 1):
+    elif d == 1 and ben >= 1 and (a == 1 or z == 1 or g == 1 or em == 1 or no == 1):
         combo += 1
-    elif d == 1 and (a == 1 or search >= 1) and (pain == 1 or met == 1):
+    elif d == 1 and (a == 1 or em == 1 or no == 1) and (pain == 1 or met == 1):
         combo += 1
     elif trap == 1 and z == 1 and g == 1 and (pain == 1 or drac == 1 or nat == 1):
         combo += 1
@@ -206,10 +218,14 @@ for run in range(0,100000):
     if trap == 1 and met == 1 and pain == 1 and drac == 1:
         eyy += 1
         
-    if ben > 0 and (a == 1 or em == 1) and z == 1:
+    if (ben > 0 or pain == 1 or drac == 1) and (a == 1 or em == 1) and z == 1:
         a_nib = 1
-    if ben > 0 and a == 1 and (z == 1 or em == 1):
-     coma_nib = 1
+    elif (ben > 0 or pain == 1 or drac == 1) and a == 1 and (z == 1 or em == 1):
+        a_nib = 1
+    elif no == 1 and ben > 0 and (a == 1 or z == 1 or em == 1):
+        a_nib = 1
+    elif ben > 0 and (((z == 1 or em == 1) and (g == 1 or d == 1)) or (z == 1 and (g == 1 or d == 1 or em == 1))):
+        a_nib = 1
     
     if combo >= 1:
         playable += 1   
@@ -222,16 +238,24 @@ for run in range(0,100000):
     if a_nib == 1 and combo >= 1:
         nibprot += 1
         #print('playable\n')
+    if ne > 0 and combo >= 1:
+        necom += 1
         
 pper = (playable/count)*100
 nibper = (nibprot/count)*100
 dbper = (delbric/count)*100
 nfafper = (nfaf/count)*100
 nfafbricper = (nfafbric/count)*100
+necomper = (necom/count)*100
+"""
 print(eyy)
 print(playable)
-print("percentage playable: %d" % pper + "%")
-print("percentage playable with nib counters: %d" % nibper + "%")
+"""
+print("percentage playable: %d" % pper + "%" + "  %d" % playable)
+print("percentage playable through nib: %d" % nibper + "%" + "  %d" % nibprot)
+print("percentage playable with non-engine in hand: %d" % necomper + "%" + "  %d" % necom)
+"""
 print("percentage bricks with delta: %d" % dbper +"%")
 print("percentage hands with 2 fafnir: %d" % nfafper +"%" + "  %d" % nfaf)
 print("percentage bricks with 2 fafnir: %d" % nfafbricper +"%" + "  %d" % nfafbric)
+"""
